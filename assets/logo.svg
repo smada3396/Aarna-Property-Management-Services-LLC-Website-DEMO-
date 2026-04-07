@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Aarna mark">
+  <defs>
+    <linearGradient id="roof" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a4a6e"/>
+      <stop offset="100%" stop-color="#0f2744"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="88" height="88" rx="20" fill="url(#roof)"/>
+  <path fill="#3db89c" d="M48 22 26 42v28h14V52h16v18h14V42L48 22z"/>
+  <path fill="#e8f4f1" opacity=".95" d="M48 26 30 43v25h10V50h16v18h10V43L48 26z"/>
+  <rect x="42" y="54" width="12" height="14" rx="1" fill="#1a4a6e"/>
+</svg>
