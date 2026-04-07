@@ -44,8 +44,8 @@ for line in cfg.SERVICE_EXTRAS:
 st.divider()
 c1, c2 = st.columns(2)
 with c1:
-    st.page_link("pages/2_Contact.py", label="Request a conversation", icon="✉️", use_container_width=True)
+    st.page_link("pages/4_Contact.py", label="Request a conversation", icon="✉️", use_container_width=True)
 with c2:
-    st.page_link("streamlit_app.py", label="Back to home", icon="🏠", use_container_width=True)
+    st.page_link("Home.py", label="Back to home", icon="🏠", use_container_width=True)
 
 theme.render_footer()
