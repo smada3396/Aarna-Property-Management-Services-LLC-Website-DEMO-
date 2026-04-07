@@ -12,7 +12,6 @@ import business_config as cfg
 _ASSETS = Path(__file__).resolve().parent / "assets"
 _LOGO_MARK = _ASSETS / "logo.svg"
 _LOGO_FULL = _ASSETS / "logo-full.svg"
-_LOGO_FULL_ON_DARK = _ASSETS / "logo-full-on-dark.svg"
 
 # Minimal stroke icons (currentColor) for navigation rows
 _SVG_WRAP = '<div class="aarna-nav-svg" aria-hidden="true">{inner}</div>'
@@ -72,14 +71,41 @@ def setup_page(
     st.set_page_config(**kwargs)
 
 
-def page_link_with_icon(page: str, label: str, icon_key: str, *, use_container_width: bool = True) -> None:
+def page_link_with_icon(
+    page: str,
+    label: str,
+    icon_key: str,
+    *,
+    use_container_width: bool = True,
+    icon_col_weight: float = 2.25,
+    label_col_weight: float = 9.75,
+) -> None:
     """Row with a line icon and a Streamlit page link (no emoji)."""
-    ic, lk = st.columns([2.25, 9.75], gap="small")
+    ic, lk = st.columns([icon_col_weight, label_col_weight], gap="small")
     with ic:
         svg = _NAV_ICONS.get(icon_key, "")
         st.markdown(f'<div class="aarna-ilink-wrap">{svg}</div>', unsafe_allow_html=True)
     with lk:
         st.page_link(page, label=label, icon=None, use_container_width=use_container_width)
+
+
+def page_links_nav_row(
+    entries: list[tuple[str, str, str]],
+    *,
+    use_container_width: bool = True,
+) -> None:
+    """Horizontal row of icon + page link groups (e.g. main site shortcuts on Home)."""
+    cols = st.columns(len(entries), gap="small")
+    for col, (page, label, icon_key) in zip(cols, entries, strict=True):
+        with col:
+            page_link_with_icon(
+                page,
+                label,
+                icon_key,
+                use_container_width=use_container_width,
+                icon_col_weight=1.2,
+                label_col_weight=3.4,
+            )
 
 
 def _svg_data_uri(path: Path) -> str | None:
@@ -146,30 +172,58 @@ def inject_css() -> None:
                 height: 100%;
                 color: #0f2744;
             }
+            .aarna-nav-svg {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                line-height: 0;
+            }
             .aarna-nav-svg svg {
                 display: block;
+                vertical-align: middle;
             }
 
-            /* Align icon column with page link row (all pages using page_link_with_icon) */
-            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]),
-            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]) {
+            /*
+             * Icon + page_link: only the inner two-column Streamlit row (not an outer 3+ column row).
+             * Matches blocks with a page link but no third top-level column.
+             */
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))),
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) {
                 align-items: center !important;
                 margin-bottom: 0.55rem !important;
             }
-            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]) > div[data-testid="column"],
-            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]) > div[data-testid="column"] {
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) > div[data-testid="column"],
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) > div[data-testid="column"] {
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: center !important;
+                align-self: stretch !important;
             }
-            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]) > div[data-testid="column"] > div,
-            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]) > div[data-testid="column"] > div {
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) > div[data-testid="column"] > div[data-testid="stVerticalBlock"],
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) > div[data-testid="column"] > div[data-testid="stVerticalBlock"] {
+                justify-content: center !important;
                 width: 100%;
             }
-            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]) [data-testid="stMarkdownContainer"] p,
-            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]) [data-testid="stMarkdownContainer"] p {
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) [data-testid="stMarkdownContainer"] p,
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) [data-testid="stMarkdownContainer"] p {
                 margin: 0 !important;
                 padding: 0 !important;
+                line-height: 1 !important;
+            }
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) div[data-testid="stPageLink-NavButton"],
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) div[data-testid="stPageLinkNavButton"] {
+                display: flex !important;
+                align-items: center !important;
+                margin: 0 !important;
+            }
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) div[data-testid="stPageLink-NavButton"] a,
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) div[data-testid="stPageLinkNavButton"] a {
+                margin: 0 !important;
+            }
+
+            /* Four-up nav row on Home: equal-height cells */
+            div[data-testid="stHorizontalBlock"]:has(> div[data-testid="column"]:nth-child(4)) {
+                align-items: stretch !important;
             }
 
             .main a, div[data-testid="stMarkdownContainer"] a {
@@ -487,22 +541,8 @@ def inject_css() -> None:
                 height: 48px;
                 flex-shrink: 0;
             }
-            .aarna-topbar-logo-wrap {
-                display: inline-flex;
-                align-items: center;
-                line-height: 0;
-            }
-            .aarna-topbar-minimal-logo.aarna-logo-for-dark-ui {
-                display: none;
-            }
 
             @media (prefers-color-scheme: dark) {
-                .aarna-topbar-minimal-logo.aarna-logo-for-light-ui {
-                    display: none !important;
-                }
-                .aarna-topbar-minimal-logo.aarna-logo-for-dark-ui {
-                    display: block !important;
-                }
                 .stApp {
                     background: linear-gradient(165deg, #0d1520 0%, #121c2b 35%, #151f30 100%) !important;
                 }
@@ -576,8 +616,7 @@ def inject_css() -> None:
 
 def hero_brand_html() -> str:
     """Logo + Aarna Property Management name for the home hero (on navy background)."""
-    logo_dark = _LOGO_FULL_ON_DARK if _LOGO_FULL_ON_DARK.is_file() else _LOGO_FULL
-    full_uri = _svg_data_uri(logo_dark)
+    full_uri = _svg_data_uri(_LOGO_FULL)
     mark_uri = _svg_data_uri(_LOGO_MARK)
     if full_uri:
         img = f'<img src="{full_uri}" class="aarna-hero-logo" alt="{cfg.COMPANY_NAME}"/>'
@@ -596,28 +635,12 @@ def hero_brand_html() -> str:
 
 def render_top_bar() -> None:
     """Compact logo + legal name only (no white card, no service area paragraph)."""
-    light_uri = _svg_data_uri(_LOGO_FULL) if _LOGO_FULL.is_file() else None
-    dark_uri = (
-        _svg_data_uri(_LOGO_FULL_ON_DARK)
-        if _LOGO_FULL_ON_DARK.is_file()
-        else light_uri
-    )
+    full_uri = _svg_data_uri(_LOGO_FULL)
     mark_uri = _svg_data_uri(_LOGO_MARK)
     parts: list[str] = ['<div class="aarna-topbar-minimal">']
-    if light_uri and dark_uri and light_uri != dark_uri:
-        parts.append('<span class="aarna-topbar-logo-wrap">')
+    if full_uri:
         parts.append(
-            f'<img src="{light_uri}" class="aarna-topbar-minimal-logo aarna-logo-for-light-ui" '
-            f'alt="{cfg.COMPANY_NAME}"/>'
-        )
-        parts.append(
-            f'<img src="{dark_uri}" class="aarna-topbar-minimal-logo aarna-logo-for-dark-ui" '
-            f'alt="" aria-hidden="true"/>'
-        )
-        parts.append("</span>")
-    elif light_uri:
-        parts.append(
-            f'<img src="{light_uri}" class="aarna-topbar-minimal-logo" alt="{cfg.COMPANY_NAME}"/>'
+            f'<img src="{full_uri}" class="aarna-topbar-minimal-logo" alt="{cfg.COMPANY_NAME}"/>'
         )
     elif mark_uri:
         parts.append(

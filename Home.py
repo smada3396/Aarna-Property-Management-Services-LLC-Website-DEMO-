@@ -80,10 +80,14 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Full width stack keeps icon + link rows aligned (avoids 2 column vertical drift)
-theme.page_link_with_icon("pages/1_Services.py", "Services", "services", use_container_width=True)
-theme.page_link_with_icon("pages/2_About_Us.py", "About", "about", use_container_width=True)
-theme.page_link_with_icon("pages/3_For_Residents.py", "Residents", "residents", use_container_width=True)
-theme.page_link_with_icon("pages/4_Contact_Us.py", "Contact", "contact", use_container_width=True)
+theme.page_links_nav_row(
+    [
+        ("pages/1_Services.py", "Services", "services"),
+        ("pages/2_About_Us.py", "About", "about"),
+        ("pages/3_For_Residents.py", "Residents", "residents"),
+        ("pages/4_Contact_Us.py", "Contact", "contact"),
+    ],
+    use_container_width=True,
+)
 
 theme.render_footer()
