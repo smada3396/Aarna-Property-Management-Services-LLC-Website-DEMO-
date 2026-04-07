@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 112" role="img" aria-label="Aarna Property Management Services LLC logo">
+  <title>Aarna Property Management Services</title>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a4a6e"/>
+      <stop offset="100%" stop-color="#0f2744"/>
+    </linearGradient>
+  </defs>
+  <!-- Mark -->
+  <g transform="translate(4,8)">
+    <rect x="0" y="0" width="88" height="88" rx="20" fill="url(#bg)"/>
+    <path fill="#3db89c" d="M44 18 22 38v28h14V48h16v18h14V38L44 18z"/>
+    <path fill="#e8f4f1" opacity=".95" d="M44 22 26 39v25h10V46h16v18h10V39L44 22z"/>
+    <rect x="38" y="50" width="12" height="14" rx="1" fill="#1a4a6e"/>
+  </g>
+  <!-- Wordmark -->
+  <text x="108" y="52" font-family="Segoe UI, system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif" font-size="38" font-weight="700" letter-spacing="-0.02em" fill="#0f2744">Aarna</text>
+  <text x="108" y="78" font-family="Segoe UI, system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif" font-size="13" font-weight="600" letter-spacing="0.14em" fill="#3db89c">PROPERTY MANAGEMENT</text>
+  <text x="108" y="98" font-family="Segoe UI, system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif" font-size="11" font-weight="400" letter-spacing="0.06em" fill="#5a6b7c">SERVICES, LLC</text>
+</svg>
