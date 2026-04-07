@@ -17,31 +17,31 @@ _LOGO_FULL = _ASSETS / "logo-full.svg"
 _SVG_WRAP = '<div class="aarna-nav-svg" aria-hidden="true">{inner}</div>'
 _NAV_ICONS: dict[str, str] = {
     "services": _SVG_WRAP.format(
-        inner='<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" '
+        inner='<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" '
         'stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">'
         '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>'
         '<line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/>'
         '<line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>'
     ),
     "about": _SVG_WRAP.format(
-        inner='<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" '
+        inner='<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" '
         'stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">'
         '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>'
     ),
     "residents": _SVG_WRAP.format(
-        inner='<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" '
+        inner='<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" '
         'stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">'
         '<path d="M3 21h18"/><path d="M5 21V7l7-3.5L19 7v14"/><path d="M9 21v-4h6v4"/>'
         '<path d="M10 10h.01"/><path d="M14 10h.01"/><path d="M10 14h.01"/><path d="M14 14h.01"/></svg>'
     ),
     "contact": _SVG_WRAP.format(
-        inner='<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" '
+        inner='<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" '
         'stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">'
         '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>'
         '<polyline points="22,6 12,13 2,6"/></svg>'
     ),
     "home": _SVG_WRAP.format(
-        inner='<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" '
+        inner='<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" '
         'stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">'
         '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'
         '<polyline points="9 22 9 12 15 12 15 22"/></svg>'
@@ -73,7 +73,7 @@ def setup_page(
 
 def page_link_with_icon(page: str, label: str, icon_key: str, *, use_container_width: bool = True) -> None:
     """Row with a line icon and a Streamlit page link (no emoji)."""
-    ic, lk = st.columns([1, 6], gap="small")
+    ic, lk = st.columns([2.25, 9.75], gap="small")
     with ic:
         svg = _NAV_ICONS.get(icon_key, "")
         st.markdown(f'<div class="aarna-ilink-wrap">{svg}</div>', unsafe_allow_html=True)
@@ -134,17 +134,41 @@ def inject_css() -> None:
                 padding-left: clamp(1rem, 4vw, 2.75rem) !important;
                 padding-right: clamp(1rem, 4vw, 2.75rem) !important;
                 max-width: 1140px !important;
+                font-size: 1.0625rem !important;
             }
 
             .aarna-ilink-wrap {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                min-height: 2.85rem;
+                min-height: 3.35rem;
+                height: 100%;
                 color: #0f2744;
             }
             .aarna-nav-svg svg {
                 display: block;
+            }
+
+            /* Align icon column with page link row (all pages using page_link_with_icon) */
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]),
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]) {
+                align-items: center !important;
+                margin-bottom: 0.55rem !important;
+            }
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]) > div[data-testid="column"],
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]) > div[data-testid="column"] {
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+            }
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]) > div[data-testid="column"] > div,
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]) > div[data-testid="column"] > div {
+                width: 100%;
+            }
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]) [data-testid="stMarkdownContainer"] p,
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]) [data-testid="stMarkdownContainer"] p {
+                margin: 0 !important;
+                padding: 0 !important;
             }
 
             .main a, div[data-testid="stMarkdownContainer"] a {
@@ -163,6 +187,7 @@ def inject_css() -> None:
                 border-radius: 12px !important;
                 border: 1px solid #c5e4d9 !important;
                 background: linear-gradient(90deg, #e8f6f2 0%, #f0faf7 100%) !important;
+                font-size: 1.05rem !important;
             }
 
             .aarna-hero {
@@ -173,22 +198,64 @@ def inject_css() -> None:
                 margin-bottom: 2rem;
                 box-shadow: 0 20px 50px rgba(15, 39, 68, 0.28), 0 0 0 1px rgba(255,255,255,0.06) inset;
             }
+            .aarna-hero-brand {
+                display: flex;
+                align-items: center;
+                gap: 1.25rem;
+                flex-wrap: wrap;
+                margin-bottom: 1.5rem;
+                padding-bottom: 1.35rem;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+            }
+            .aarna-hero-logo {
+                max-height: 76px;
+                width: auto;
+                max-width: min(100%, 300px);
+                display: block;
+            }
+            .aarna-hero-logo-mark {
+                width: 64px;
+                height: 64px;
+                flex-shrink: 0;
+                display: block;
+            }
+            .aarna-hero-company {
+                display: flex;
+                flex-direction: column;
+                gap: 0.2rem;
+                min-width: 0;
+            }
+            .aarna-hero-co-primary {
+                font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+                font-size: clamp(1.4rem, 3.2vw, 1.95rem);
+                font-weight: 700;
+                color: #f4f7fa;
+                letter-spacing: -0.02em;
+                line-height: 1.15;
+            }
+            .aarna-hero-co-sub {
+                font-size: 0.82rem;
+                font-weight: 600;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                color: #7ee8d0;
+            }
             .aarna-hero h1 {
-                font-size: clamp(1.85rem, 4.2vw, 2.45rem);
+                font-size: clamp(2.05rem, 4.5vw, 2.75rem);
                 font-weight: 700;
                 margin: 0 0 0.85rem 0;
                 letter-spacing: -0.03em;
                 line-height: 1.18;
             }
             .aarna-hero p.lead {
-                font-size: 1.08rem;
+                font-size: 1.2rem;
                 opacity: 0.96;
                 margin: 0 0 0.6rem 0;
                 line-height: 1.6;
                 max-width: 42rem;
             }
             .aarna-hero p.sub {
-                font-size: 0.94rem;
+                font-size: 1.05rem;
                 opacity: 0.9;
                 margin: 0;
                 line-height: 1.55;
@@ -198,10 +265,10 @@ def inject_css() -> None:
                 display: inline-block;
                 background: rgba(61, 184, 156, 0.22);
                 color: #c5f5e8;
-                font-size: 0.7rem;
+                font-size: 0.78rem;
                 font-weight: 600;
                 letter-spacing: 0.16em;
-                padding: 0.4rem 0.75rem;
+                padding: 0.45rem 0.85rem;
                 border-radius: 8px;
                 margin-bottom: 1.1rem;
                 text-transform: uppercase;
@@ -218,20 +285,20 @@ def inject_css() -> None:
                 border-left: 3px solid #3db89c;
             }
             .aarna-card h3 {
-                font-size: 1.08rem;
+                font-size: 1.2rem;
                 margin: 0 0 0.55rem 0;
                 color: #0f2744;
                 font-weight: 600;
             }
             .aarna-card p {
                 margin: 0;
-                font-size: 0.95rem;
+                font-size: 1.06rem;
                 color: #4a5a6e;
-                line-height: 1.6;
+                line-height: 1.62;
             }
 
             .aarna-section-title {
-                font-size: 1.45rem;
+                font-size: 1.65rem;
                 font-weight: 700;
                 color: #0f2744;
                 margin: 0 0 0.85rem 0;
@@ -239,8 +306,8 @@ def inject_css() -> None:
             }
             .aarna-muted {
                 color: #5a6b7c;
-                font-size: 0.97rem;
-                line-height: 1.62;
+                font-size: 1.08rem;
+                line-height: 1.65;
             }
 
             .aarna-trust-bar {
@@ -252,11 +319,11 @@ def inject_css() -> None:
                 list-style: none;
             }
             .aarna-trust-bar li {
-                font-size: 0.87rem;
+                font-size: 0.98rem;
                 color: #c5dde8;
                 padding-left: 1.15rem;
                 position: relative;
-                line-height: 1.45;
+                line-height: 1.5;
             }
             .aarna-trust-bar li::before {
                 content: "";
@@ -272,7 +339,7 @@ def inject_css() -> None:
 
             .aarna-steps {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
                 gap: 1.1rem;
                 margin-top: 0.65rem;
             }
@@ -286,45 +353,46 @@ def inject_css() -> None:
             .aarna-step strong {
                 display: block;
                 color: #0f2744;
-                font-size: 0.95rem;
+                font-size: 1.06rem;
                 margin-bottom: 0.4rem;
                 font-family: "Plus Jakarta Sans", sans-serif;
             }
             .aarna-step span {
                 color: #5a6b7c;
-                font-size: 0.9rem;
-                line-height: 1.55;
+                font-size: 1.02rem;
+                line-height: 1.58;
             }
 
             .aarna-footer {
                 margin-top: 3.5rem;
                 padding-top: 1.75rem;
                 border-top: 1px solid #dde5ee;
-                font-size: 0.8rem;
+                font-size: 0.92rem;
                 color: #7a8a9c;
-                line-height: 1.55;
+                line-height: 1.58;
             }
 
-            .aarna-topbar {
+            .aarna-topbar-minimal {
                 display: flex;
-                align-items: flex-start;
-                gap: 1.15rem;
+                align-items: center;
+                gap: 1rem;
                 flex-wrap: wrap;
-                margin-bottom: 1.65rem;
+                margin-bottom: 1.35rem;
+                padding: 0.15rem 0;
             }
-            .aarna-topbar-card {
-                background: #ffffff;
-                border: 1px solid #e1e8f0;
-                border-radius: 16px;
-                padding: 1.35rem 1.5rem;
-                box-shadow: 0 8px 32px rgba(15, 39, 68, 0.08);
+            .aarna-topbar-minimal-logo {
+                max-height: 52px;
+                width: auto;
+                max-width: 240px;
+                display: block;
             }
-            .aarna-topbar .tagline {
-                margin: 0.35rem 0 0 0;
-                font-size: 0.9rem;
-                color: #5a6b7c;
-                max-width: 38rem;
-                line-height: 1.55;
+            .aarna-topbar-minimal-name {
+                font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+                font-size: 1.12rem;
+                font-weight: 600;
+                color: #0f2744;
+                letter-spacing: -0.02em;
+                line-height: 1.25;
             }
 
             div[data-testid="stSidebarContent"] {
@@ -347,7 +415,7 @@ def inject_css() -> None:
             div[data-testid="stSidebarNav"] a span {
                 color: #e8eef4 !important;
                 font-weight: 500 !important;
-                font-size: 0.92rem !important;
+                font-size: 1.04rem !important;
                 letter-spacing: 0.01em;
             }
             div[data-testid="stSidebarNav"] a:hover span { color: #7ee8d0 !important; }
@@ -364,13 +432,16 @@ def inject_css() -> None:
             div[data-testid="stPageLinkNavButton"] a {
                 display: flex !important;
                 align-items: center;
-                justify-content: center;
-                padding: 0.7rem 1rem !important;
+                justify-content: flex-start;
+                padding: 0.85rem 1.15rem !important;
                 border-radius: 12px !important;
                 border: 1px solid #d0dbe8 !important;
                 background: #ffffff !important;
                 font-weight: 600 !important;
+                font-size: 1.1rem !important;
                 color: #0f2744 !important;
+                min-height: 3.35rem !important;
+                box-sizing: border-box !important;
                 box-shadow: 0 2px 8px rgba(15, 39, 68, 0.06) !important;
                 transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
             }
@@ -385,8 +456,9 @@ def inject_css() -> None:
                 border-color: #2fa889 !important;
                 color: #06261f !important;
                 font-weight: 600 !important;
+                font-size: 1.05rem !important;
                 border-radius: 10px !important;
-                padding: 0.5rem 1.25rem !important;
+                padding: 0.55rem 1.35rem !important;
                 box-shadow: 0 4px 14px rgba(61, 184, 156, 0.35) !important;
             }
             div[data-testid="stButton"] button[kind="primary"]:hover {
@@ -396,8 +468,24 @@ def inject_css() -> None:
 
             div[data-baseweb="input"] > div { border-radius: 10px !important; }
             div[data-baseweb="select"] > div { border-radius: 10px !important; }
+            div[data-baseweb="select"] div[role="combobox"] span,
+            ul[data-baseweb="menu"] li {
+                font-size: 1.05rem !important;
+            }
+            div[data-baseweb="input"] input,
+            div[data-baseweb="textarea"] textarea {
+                font-size: 1.05rem !important;
+            }
+            [data-testid="stWidgetLabel"] p,
+            label[data-testid="stWidgetLabel"] {
+                font-size: 1.02rem !important;
+            }
 
-            .aarna-topbar-title { color: #0f2744; }
+            .aarna-topbar-minimal-mark {
+                width: 48px;
+                height: 48px;
+                flex-shrink: 0;
+            }
 
             @media (prefers-color-scheme: dark) {
                 .stApp {
@@ -410,7 +498,7 @@ def inject_css() -> None:
                 .main .block-container {
                     background: transparent !important;
                 }
-                .aarna-topbar-card, .aarna-card, .aarna-step {
+                .aarna-card, .aarna-step {
                     background: #1a2636 !important;
                     border-color: #2d3f56 !important;
                     box-shadow: 0 4px 24px rgba(0,0,0,0.35) !important;
@@ -418,8 +506,11 @@ def inject_css() -> None:
                 .aarna-card h3, .aarna-section-title, .aarna-step strong {
                     color: #e8eef4 !important;
                 }
-                .aarna-card p, .aarna-muted, .aarna-step span, .aarna-topbar .tagline {
+                .aarna-card p, .aarna-muted, .aarna-step span {
                     color: #b4c0d4 !important;
+                }
+                .aarna-topbar-minimal-name {
+                    color: #e8eef4 !important;
                 }
                 .aarna-footer {
                     border-top-color: #2d3f56 !important;
@@ -432,7 +523,6 @@ def inject_css() -> None:
                     color: #7ee8d0 !important;
                 }
                 .aarna-ilink-wrap { color: #8ecfff !important; }
-                .aarna-topbar-title { color: #e8eef4 !important; }
                 div[data-testid="stAlert"] {
                     background: linear-gradient(90deg, #152535 0%, #1a3045 100%) !important;
                     border-color: #2d5a4a !important;
@@ -453,13 +543,15 @@ def inject_css() -> None:
                     background-color: #1a2636 !important;
                     color: #e8eef4 !important;
                     border-color: #3d5269 !important;
+                    font-size: 1.05rem !important;
                 }
                 div[data-baseweb="select"] > div {
                     background-color: #1a2636 !important;
                     color: #e8eef4 !important;
                     border-color: #3d5269 !important;
                 }
-                [data-testid="stWidgetLabel"] p { color: #b4c0d4 !important; }
+                [data-testid="stWidgetLabel"] p,
+                label[data-testid="stWidgetLabel"] { color: #b4c0d4 !important; font-size: 1.02rem !important; }
             }
         </style>
         """,
@@ -467,31 +559,39 @@ def inject_css() -> None:
     )
 
 
-def render_top_bar() -> None:
+def hero_brand_html() -> str:
+    """Logo + Aarna Property Management name for the home hero (on navy background)."""
     full_uri = _svg_data_uri(_LOGO_FULL)
     mark_uri = _svg_data_uri(_LOGO_MARK)
-    parts: list[str] = ['<div class="aarna-topbar aarna-topbar-card">']
+    if full_uri:
+        img = f'<img src="{full_uri}" class="aarna-hero-logo" alt="{cfg.COMPANY_NAME}"/>'
+    elif mark_uri:
+        img = f'<img src="{mark_uri}" class="aarna-hero-logo-mark" alt="{cfg.SHORT_NAME} logo"/>'
+    else:
+        img = ""
+    names = (
+        '<div class="aarna-hero-company">'
+        '<span class="aarna-hero-co-primary">Aarna Property Management</span>'
+        '<span class="aarna-hero-co-sub">Services, LLC</span>'
+        "</div>"
+    )
+    return f'<div class="aarna-hero-brand">{img}{names}</div>'
+
+
+def render_top_bar() -> None:
+    """Compact logo + legal name only (no white card, no service area paragraph)."""
+    full_uri = _svg_data_uri(_LOGO_FULL)
+    mark_uri = _svg_data_uri(_LOGO_MARK)
+    parts: list[str] = ['<div class="aarna-topbar-minimal">']
     if full_uri:
         parts.append(
-            f'<div><img src="{full_uri}" style="max-width:min(100%,300px);height:auto;display:block;" '
-            f'alt="{cfg.COMPANY_NAME}"/></div>'
+            f'<img src="{full_uri}" class="aarna-topbar-minimal-logo" alt="{cfg.COMPANY_NAME}"/>'
         )
     elif mark_uri:
         parts.append(
-            f'<div style="display:flex;align-items:center;gap:0.85rem;">'
-            f'<img src="{mark_uri}" width="56" height="56" alt="{cfg.SHORT_NAME} mark"/>'
-            f'<strong class="aarna-topbar-title" style="font-size:1.05rem;font-family:Plus Jakarta Sans,sans-serif;">'
-            f"{cfg.COMPANY_NAME}</strong></div>"
+            f'<img src="{mark_uri}" class="aarna-topbar-minimal-mark" alt=""/>'
         )
-    else:
-        parts.append(
-            f'<div><strong class="aarna-topbar-title" style="font-size:1.1rem;font-family:Plus Jakarta Sans,sans-serif;">'
-            f"{cfg.COMPANY_NAME}</strong></div>"
-        )
-    parts.append(
-        f'<div style="flex:1;min-width:200px;"><p class="tagline">{cfg.SERVICE_AREA}</p></div>'
-        "</div>"
-    )
+    parts.append(f'<span class="aarna-topbar-minimal-name">{cfg.COMPANY_NAME}</span></div>')
     st.markdown("".join(parts), unsafe_allow_html=True)
 
 

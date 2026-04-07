@@ -50,7 +50,7 @@ with st.container():
                 {phone_block}
                 {address_block}
                 <p style="margin:0 0 0.75rem 0;"><strong>Service area</strong><br/>{cfg.SERVICE_AREA}</p>
-                <p style="margin:0;font-size:0.9rem;color:#5a6b7c;"><strong>Hours</strong><br/>{cfg.BUSINESS_HOURS}</p>
+                <p style="margin:0;font-size:1.02rem;color:#5a6b7c;"><strong>Hours</strong><br/>{cfg.BUSINESS_HOURS}</p>
             </div>
             """,
             unsafe_allow_html=True,
@@ -59,7 +59,7 @@ with st.container():
             f"""
             <div class="aarna-card" style="margin-top:1rem;">
                 <h3 style="margin-top:0;">What to expect</h3>
-                <p style="margin:0;font-size:0.95rem;color:#4a5a6e;line-height:1.55;">{cfg.RESPONSE_POLICY}</p>
+                <p style="margin:0;font-size:1.05rem;color:#4a5a6e;line-height:1.58;">{cfg.RESPONSE_POLICY}</p>
             </div>
             """,
             unsafe_allow_html=True,

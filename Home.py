@@ -9,14 +9,15 @@ import theme
 
 theme.setup_page("Home")
 theme.inject_css()
-theme.render_top_bar()
 
 trust_items = "".join(
     f"<li><strong>{title}</strong>: {desc}</li>" for title, desc in cfg.HOME_TRUST_POINTS
 )
+_brand = theme.hero_brand_html()
 st.markdown(
     f"""
     <div class="aarna-hero">
+        {_brand}
         <div class="aarna-badge">Property management, Maryland</div>
         <h1>{cfg.TAGLINE}</h1>
         <p class="lead">{cfg.HERO_SUBTITLE}</p>
@@ -79,15 +80,10 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-row1a, row1b = st.columns(2)
-with row1a:
-    theme.page_link_with_icon("pages/1_Services.py", "Services", "services", use_container_width=True)
-with row1b:
-    theme.page_link_with_icon("pages/2_About_Us.py", "About", "about", use_container_width=True)
-row2a, row2b = st.columns(2)
-with row2a:
-    theme.page_link_with_icon("pages/3_For_Residents.py", "Residents", "residents", use_container_width=True)
-with row2b:
-    theme.page_link_with_icon("pages/4_Contact_Us.py", "Contact", "contact", use_container_width=True)
+# Full width stack keeps icon + link rows aligned (avoids 2 column vertical drift)
+theme.page_link_with_icon("pages/1_Services.py", "Services", "services", use_container_width=True)
+theme.page_link_with_icon("pages/2_About_Us.py", "About", "about", use_container_width=True)
+theme.page_link_with_icon("pages/3_For_Residents.py", "Residents", "residents", use_container_width=True)
+theme.page_link_with_icon("pages/4_Contact_Us.py", "Contact", "contact", use_container_width=True)
 
 theme.render_footer()
