@@ -13,39 +13,13 @@ _ASSETS = Path(__file__).resolve().parent / "assets"
 _LOGO_MARK = _ASSETS / "logo.svg"
 _LOGO_FULL = _ASSETS / "logo-full.svg"
 
-# Minimal stroke icons (currentColor) for navigation rows
-_SVG_WRAP = '<div class="aarna-nav-svg" aria-hidden="true">{inner}</div>'
-_NAV_ICONS: dict[str, str] = {
-    "services": _SVG_WRAP.format(
-        inner='<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" '
-        'stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">'
-        '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>'
-        '<line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/>'
-        '<line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>'
-    ),
-    "about": _SVG_WRAP.format(
-        inner='<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" '
-        'stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">'
-        '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>'
-    ),
-    "residents": _SVG_WRAP.format(
-        inner='<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" '
-        'stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">'
-        '<path d="M3 21h18"/><path d="M5 21V7l7-3.5L19 7v14"/><path d="M9 21v-4h6v4"/>'
-        '<path d="M10 10h.01"/><path d="M14 10h.01"/><path d="M10 14h.01"/><path d="M14 14h.01"/></svg>'
-    ),
-    "contact": _SVG_WRAP.format(
-        inner='<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" '
-        'stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">'
-        '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>'
-        '<polyline points="22,6 12,13 2,6"/></svg>'
-    ),
-    "home": _SVG_WRAP.format(
-        inner='<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" '
-        'stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">'
-        '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'
-        '<polyline points="9 22 9 12 15 12 15 22"/></svg>'
-    ),
+# Material Symbols (built into Streamlit page_link): one widget = icon + label
+_NAV_MATERIAL_ICONS: dict[str, str] = {
+    "services": ":material/format_list_bulleted:",
+    "about": ":material/info:",
+    "residents": ":material/apartment:",
+    "contact": ":material/mail:",
+    "home": ":material/home:",
 }
 
 
@@ -77,16 +51,10 @@ def page_link_with_icon(
     icon_key: str,
     *,
     use_container_width: bool = True,
-    icon_col_weight: float = 2.25,
-    label_col_weight: float = 9.75,
 ) -> None:
-    """Row with a line icon and a Streamlit page link (no emoji)."""
-    ic, lk = st.columns([icon_col_weight, label_col_weight], gap="small")
-    with ic:
-        svg = _NAV_ICONS.get(icon_key, "")
-        st.markdown(f'<div class="aarna-ilink-wrap">{svg}</div>', unsafe_allow_html=True)
-    with lk:
-        st.page_link(page, label=label, icon=None, use_container_width=use_container_width)
+    """Single page link with Material icon immediately left of the label (Streamlit native)."""
+    mat = _NAV_MATERIAL_ICONS.get(icon_key)
+    st.page_link(page, label=label, icon=mat, use_container_width=use_container_width)
 
 
 def page_links_nav_row(
@@ -94,18 +62,11 @@ def page_links_nav_row(
     *,
     use_container_width: bool = True,
 ) -> None:
-    """Horizontal row of icon + page link groups (e.g. main site shortcuts on Home)."""
+    """Horizontal row of icon+label page links (e.g. main site shortcuts on Home)."""
     cols = st.columns(len(entries), gap="small")
     for col, (page, label, icon_key) in zip(cols, entries, strict=True):
         with col:
-            page_link_with_icon(
-                page,
-                label,
-                icon_key,
-                use_container_width=use_container_width,
-                icon_col_weight=1.2,
-                label_col_weight=3.4,
-            )
+            page_link_with_icon(page, label, icon_key, use_container_width=use_container_width)
 
 
 def _svg_data_uri(path: Path) -> str | None:
@@ -164,64 +125,10 @@ def inject_css() -> None:
                 font-size: 1.0625rem !important;
             }
 
-            .aarna-ilink-wrap {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                min-height: 3.35rem;
-                height: 100%;
-                color: #0f2744;
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]),
+            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]) {
+                margin-bottom: 0.35rem !important;
             }
-            .aarna-nav-svg {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                line-height: 0;
-            }
-            .aarna-nav-svg svg {
-                display: block;
-                vertical-align: middle;
-            }
-
-            /*
-             * Icon + page_link: only the inner two-column Streamlit row (not an outer 3+ column row).
-             * Matches blocks with a page link but no third top-level column.
-             */
-            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))),
-            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) {
-                align-items: center !important;
-                margin-bottom: 0.55rem !important;
-            }
-            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) > div[data-testid="column"],
-            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) > div[data-testid="column"] {
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: center !important;
-                align-self: stretch !important;
-            }
-            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) > div[data-testid="column"] > div[data-testid="stVerticalBlock"],
-            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) > div[data-testid="column"] > div[data-testid="stVerticalBlock"] {
-                justify-content: center !important;
-                width: 100%;
-            }
-            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) [data-testid="stMarkdownContainer"] p,
-            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) [data-testid="stMarkdownContainer"] p {
-                margin: 0 !important;
-                padding: 0 !important;
-                line-height: 1 !important;
-            }
-            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) div[data-testid="stPageLink-NavButton"],
-            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) div[data-testid="stPageLinkNavButton"] {
-                display: flex !important;
-                align-items: center !important;
-                margin: 0 !important;
-            }
-            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLink-NavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) div[data-testid="stPageLink-NavButton"] a,
-            div[data-testid="stHorizontalBlock"]:has([data-testid="stPageLinkNavButton"]):not(:has(> div[data-testid="column"]:nth-child(3))) div[data-testid="stPageLinkNavButton"] a {
-                margin: 0 !important;
-            }
-
-            /* Four-up nav row on Home: equal-height cells */
             div[data-testid="stHorizontalBlock"]:has(> div[data-testid="column"]:nth-child(4)) {
                 align-items: stretch !important;
             }
@@ -486,9 +393,11 @@ def inject_css() -> None:
             div[data-testid="stPageLink-NavButton"] a,
             div[data-testid="stPageLinkNavButton"] a {
                 display: flex !important;
-                align-items: center;
-                justify-content: flex-start;
-                padding: 0.85rem 1.15rem !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                gap: 0.5rem !important;
+                padding: 0.85rem 1.05rem !important;
                 border-radius: 12px !important;
                 border: 1px solid #d0dbe8 !important;
                 background: #ffffff !important;
@@ -577,7 +486,6 @@ def inject_css() -> None:
                 .main a:hover, div[data-testid="stMarkdownContainer"] a:hover {
                     color: #7ee8d0 !important;
                 }
-                .aarna-ilink-wrap { color: #8ecfff !important; }
                 div[data-testid="stAlert"] {
                     background: linear-gradient(90deg, #152535 0%, #1a3045 100%) !important;
                     border-color: #2d5a4a !important;
