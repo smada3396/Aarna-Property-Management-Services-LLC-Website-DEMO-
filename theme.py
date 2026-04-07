@@ -13,6 +13,41 @@ _ASSETS = Path(__file__).resolve().parent / "assets"
 _LOGO_MARK = _ASSETS / "logo.svg"
 _LOGO_FULL = _ASSETS / "logo-full.svg"
 
+# Minimal stroke icons (currentColor) for navigation rows
+_SVG_WRAP = '<div class="aarna-nav-svg" aria-hidden="true">{inner}</div>'
+_NAV_ICONS: dict[str, str] = {
+    "services": _SVG_WRAP.format(
+        inner='<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" '
+        'stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">'
+        '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>'
+        '<line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/>'
+        '<line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>'
+    ),
+    "about": _SVG_WRAP.format(
+        inner='<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" '
+        'stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">'
+        '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>'
+    ),
+    "residents": _SVG_WRAP.format(
+        inner='<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" '
+        'stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">'
+        '<path d="M3 21h18"/><path d="M5 21V7l7-3.5L19 7v14"/><path d="M9 21v-4h6v4"/>'
+        '<path d="M10 10h.01"/><path d="M14 10h.01"/><path d="M10 14h.01"/><path d="M14 14h.01"/></svg>'
+    ),
+    "contact": _SVG_WRAP.format(
+        inner='<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" '
+        'stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">'
+        '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>'
+        '<polyline points="22,6 12,13 2,6"/></svg>'
+    ),
+    "home": _SVG_WRAP.format(
+        inner='<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" '
+        'stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">'
+        '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'
+        '<polyline points="9 22 9 12 15 12 15 22"/></svg>'
+    ),
+}
+
 
 def setup_page(
     page_title: str,
@@ -20,18 +55,30 @@ def setup_page(
     layout: str = "wide",
     sidebar: str = "expanded",
 ) -> None:
-    title = f"{cfg.SHORT_NAME} — {page_title}" if page_title else cfg.COMPANY_NAME
-    st.set_page_config(
-        page_title=title,
-        page_icon="🏠",
-        layout=layout,
-        initial_sidebar_state=sidebar,
-        menu_items={
+    title = f"{cfg.SHORT_NAME} | {page_title}" if page_title else cfg.COMPANY_NAME
+    kwargs: dict = {
+        "page_title": title,
+        "layout": layout,
+        "initial_sidebar_state": sidebar,
+        "menu_items": {
             "Get help": None,
             "Report a bug": None,
             "About": None,
         },
-    )
+    }
+    if _LOGO_MARK.is_file():
+        kwargs["page_icon"] = str(_LOGO_MARK)
+    st.set_page_config(**kwargs)
+
+
+def page_link_with_icon(page: str, label: str, icon_key: str, *, use_container_width: bool = True) -> None:
+    """Row with a line icon and a Streamlit page link (no emoji)."""
+    ic, lk = st.columns([1, 6], gap="small")
+    with ic:
+        svg = _NAV_ICONS.get(icon_key, "")
+        st.markdown(f'<div class="aarna-ilink-wrap">{svg}</div>', unsafe_allow_html=True)
+    with lk:
+        st.page_link(page, label=label, icon=None, use_container_width=use_container_width)
 
 
 def _svg_data_uri(path: Path) -> str | None:
@@ -49,7 +96,7 @@ def inject_css() -> None:
             @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap');
 
             html {
-                scroll-padding-top: 5.5rem;
+                scroll-padding-top: 6.5rem;
             }
 
             html, body {
@@ -60,14 +107,12 @@ def inject_css() -> None:
                 font-family: "Plus Jakarta Sans", "DM Sans", system-ui, sans-serif;
             }
 
-            /* App canvas — subtle premium background */
             .stApp {
                 background: linear-gradient(165deg, #e8eef5 0%, #f2f5f9 22%, #fafbfc 55%, #ffffff 100%) !important;
             }
 
-            /* Keep Streamlit header visible but separated; push main content below it */
             header[data-testid="stHeader"] {
-                background: rgba(255, 255, 255, 0.97) !important;
+                background: rgba(255, 255, 255, 0.98) !important;
                 border-bottom: 1px solid #dde5ee !important;
                 backdrop-filter: blur(10px);
             }
@@ -75,16 +120,31 @@ def inject_css() -> None:
                 display: none;
             }
 
+            div[data-testid="stToolbar"] {
+                background: transparent !important;
+            }
+
             section[data-testid="stMain"] > div {
-                padding-top: 0.75rem;
+                padding-top: 1.25rem !important;
             }
 
             .main .block-container {
-                padding-top: 3.5rem !important;
+                padding-top: 6rem !important;
                 padding-bottom: 4rem !important;
                 padding-left: clamp(1rem, 4vw, 2.75rem) !important;
                 padding-right: clamp(1rem, 4vw, 2.75rem) !important;
                 max-width: 1140px !important;
+            }
+
+            .aarna-ilink-wrap {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 2.85rem;
+                color: #0f2744;
+            }
+            .aarna-nav-svg svg {
+                display: block;
             }
 
             .main a, div[data-testid="stMarkdownContainer"] a {
@@ -99,7 +159,6 @@ def inject_css() -> None:
 
             footer { visibility: hidden !important; height: 0 !important; }
 
-            /* Alerts — calmer, on-brand */
             div[data-testid="stAlert"] {
                 border-radius: 12px !important;
                 border: 1px solid #c5e4d9 !important;
@@ -268,7 +327,6 @@ def inject_css() -> None:
                 line-height: 1.55;
             }
 
-            /* Sidebar — navigation reads like a site menu */
             div[data-testid="stSidebarContent"] {
                 background: linear-gradient(180deg, #0a1f35 0%, #0f2744 45%, #122a47 100%) !important;
                 border-right: 1px solid rgba(255,255,255,0.06);
@@ -278,15 +336,9 @@ def inject_css() -> None:
             div[data-testid="stSidebarContent"] label {
                 color: #e8eef4 !important;
             }
-            div[data-testid="stSidebarNav"] {
-                padding-top: 0.35rem;
-            }
-            div[data-testid="stSidebarNav"] ul {
-                gap: 0.15rem;
-            }
-            div[data-testid="stSidebarNav"] li {
-                margin: 0.1rem 0;
-            }
+            div[data-testid="stSidebarNav"] { padding-top: 0.35rem; }
+            div[data-testid="stSidebarNav"] ul { gap: 0.15rem; }
+            div[data-testid="stSidebarNav"] li { margin: 0.1rem 0; }
             div[data-testid="stSidebarNav"] a {
                 border-radius: 10px !important;
                 padding: 0.5rem 0.65rem !important;
@@ -298,9 +350,7 @@ def inject_css() -> None:
                 font-size: 0.92rem !important;
                 letter-spacing: 0.01em;
             }
-            div[data-testid="stSidebarNav"] a:hover span {
-                color: #7ee8d0 !important;
-            }
+            div[data-testid="stSidebarNav"] a:hover span { color: #7ee8d0 !important; }
             div[data-testid="stSidebarNav"] li:has(a[aria-current="page"]) {
                 background: rgba(61, 184, 156, 0.18) !important;
                 border-radius: 10px;
@@ -310,7 +360,6 @@ def inject_css() -> None:
                 font-weight: 600 !important;
             }
 
-            /* In-page navigation buttons */
             div[data-testid="stPageLink-NavButton"] a,
             div[data-testid="stPageLinkNavButton"] a {
                 display: flex !important;
@@ -345,12 +394,72 @@ def inject_css() -> None:
                 border-color: #2a9d7a !important;
             }
 
-            /* Form fields — slightly softer */
-            div[data-baseweb="input"] > div {
-                border-radius: 10px !important;
-            }
-            div[data-baseweb="select"] > div {
-                border-radius: 10px !important;
+            div[data-baseweb="input"] > div { border-radius: 10px !important; }
+            div[data-baseweb="select"] > div { border-radius: 10px !important; }
+
+            .aarna-topbar-title { color: #0f2744; }
+
+            @media (prefers-color-scheme: dark) {
+                .stApp {
+                    background: linear-gradient(165deg, #0d1520 0%, #121c2b 35%, #151f30 100%) !important;
+                }
+                header[data-testid="stHeader"] {
+                    background: rgba(13, 21, 32, 0.96) !important;
+                    border-bottom: 1px solid #2a3a50 !important;
+                }
+                .main .block-container {
+                    background: transparent !important;
+                }
+                .aarna-topbar-card, .aarna-card, .aarna-step {
+                    background: #1a2636 !important;
+                    border-color: #2d3f56 !important;
+                    box-shadow: 0 4px 24px rgba(0,0,0,0.35) !important;
+                }
+                .aarna-card h3, .aarna-section-title, .aarna-step strong {
+                    color: #e8eef4 !important;
+                }
+                .aarna-card p, .aarna-muted, .aarna-step span, .aarna-topbar .tagline {
+                    color: #b4c0d4 !important;
+                }
+                .aarna-footer {
+                    border-top-color: #2d3f56 !important;
+                    color: #8a9bb4 !important;
+                }
+                .main a, div[data-testid="stMarkdownContainer"] a {
+                    color: #6ecfff !important;
+                }
+                .main a:hover, div[data-testid="stMarkdownContainer"] a:hover {
+                    color: #7ee8d0 !important;
+                }
+                .aarna-ilink-wrap { color: #8ecfff !important; }
+                .aarna-topbar-title { color: #e8eef4 !important; }
+                div[data-testid="stAlert"] {
+                    background: linear-gradient(90deg, #152535 0%, #1a3045 100%) !important;
+                    border-color: #2d5a4a !important;
+                }
+                div[data-testid="stPageLink-NavButton"] a,
+                div[data-testid="stPageLinkNavButton"] a {
+                    background: #1e2d40 !important;
+                    border-color: #3d5269 !important;
+                    color: #e8eef4 !important;
+                }
+                div[data-testid="stMarkdownContainer"] p,
+                div[data-testid="stMarkdownContainer"] li,
+                div[data-testid="stMarkdownContainer"] label {
+                    color: #c5d0e0 !important;
+                }
+                div[data-baseweb="input"] input,
+                div[data-baseweb="textarea"] textarea {
+                    background-color: #1a2636 !important;
+                    color: #e8eef4 !important;
+                    border-color: #3d5269 !important;
+                }
+                div[data-baseweb="select"] > div {
+                    background-color: #1a2636 !important;
+                    color: #e8eef4 !important;
+                    border-color: #3d5269 !important;
+                }
+                [data-testid="stWidgetLabel"] p { color: #b4c0d4 !important; }
             }
         </style>
         """,
@@ -371,12 +480,12 @@ def render_top_bar() -> None:
         parts.append(
             f'<div style="display:flex;align-items:center;gap:0.85rem;">'
             f'<img src="{mark_uri}" width="56" height="56" alt="{cfg.SHORT_NAME} mark"/>'
-            f'<strong style="font-size:1.05rem;color:#0f2744;font-family:Plus Jakarta Sans,sans-serif;">'
+            f'<strong class="aarna-topbar-title" style="font-size:1.05rem;font-family:Plus Jakarta Sans,sans-serif;">'
             f"{cfg.COMPANY_NAME}</strong></div>"
         )
     else:
         parts.append(
-            f'<div><strong style="font-size:1.1rem;color:#0f2744;font-family:Plus Jakarta Sans,sans-serif;">'
+            f'<div><strong class="aarna-topbar-title" style="font-size:1.1rem;font-family:Plus Jakarta Sans,sans-serif;">'
             f"{cfg.COMPANY_NAME}</strong></div>"
         )
     parts.append(

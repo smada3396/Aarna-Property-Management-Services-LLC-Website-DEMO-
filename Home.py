@@ -1,4 +1,4 @@
-"""Aarna Property Management Services — public marketing home page."""
+"""Aarna Property Management Services public marketing home page."""
 
 from __future__ import annotations
 
@@ -12,12 +12,12 @@ theme.inject_css()
 theme.render_top_bar()
 
 trust_items = "".join(
-    f"<li><strong>{title}</strong> — {desc}</li>" for title, desc in cfg.HOME_TRUST_POINTS
+    f"<li><strong>{title}</strong>: {desc}</li>" for title, desc in cfg.HOME_TRUST_POINTS
 )
 st.markdown(
     f"""
     <div class="aarna-hero">
-        <div class="aarna-badge">Property management · Maryland</div>
+        <div class="aarna-badge">Property management, Maryland</div>
         <h1>{cfg.TAGLINE}</h1>
         <p class="lead">{cfg.HERO_SUBTITLE}</p>
         <p class="sub">{cfg.RESPONSE_POLICY}</p>
@@ -45,7 +45,7 @@ with c2:
         """
         <div class="aarna-card">
             <h3>For residents</h3>
-            <p>Clear processes, respectful communication, and timely follow-up when something needs attention at home.</p>
+            <p>Clear processes, respectful communication, and timely follow up when something needs attention at home.</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -63,7 +63,7 @@ with c3:
 
 st.markdown('<p class="aarna-section-title" style="margin-top:2rem;">How we work with owners</p>', unsafe_allow_html=True)
 st.markdown(
-    "<p class='aarna-muted'>A straightforward path from first conversation to day-to-day management.</p>",
+    "<p class='aarna-muted'>A straightforward path from first conversation to day to day management.</p>",
     unsafe_allow_html=True,
 )
 
@@ -79,14 +79,15 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-b1, b2, b3, b4 = st.columns(4)
-with b1:
-    st.page_link("pages/1_Services.py", label="Services", icon="📋", use_container_width=True)
-with b2:
-    st.page_link("pages/2_About_Us.py", label="About", icon="ℹ️", use_container_width=True)
-with b3:
-    st.page_link("pages/3_For_Residents.py", label="Residents", icon="🏡", use_container_width=True)
-with b4:
-    st.page_link("pages/4_Contact_Us.py", label="Contact", icon="✉️", use_container_width=True)
+row1a, row1b = st.columns(2)
+with row1a:
+    theme.page_link_with_icon("pages/1_Services.py", "Services", "services", use_container_width=True)
+with row1b:
+    theme.page_link_with_icon("pages/2_About_Us.py", "About", "about", use_container_width=True)
+row2a, row2b = st.columns(2)
+with row2a:
+    theme.page_link_with_icon("pages/3_For_Residents.py", "Residents", "residents", use_container_width=True)
+with row2b:
+    theme.page_link_with_icon("pages/4_Contact_Us.py", "Contact", "contact", use_container_width=True)
 
 theme.render_footer()

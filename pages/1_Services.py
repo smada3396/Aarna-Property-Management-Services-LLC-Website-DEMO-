@@ -35,7 +35,7 @@ for i, item in enumerate(cfg.SERVICES):
 
 st.markdown('<p class="aarna-section-title" style="margin-top:1.5rem;">Also available where needed</p>', unsafe_allow_html=True)
 st.markdown(
-    "<p class='aarna-muted'>We layer these in based on your property and agreement—not every item applies to every home.</p>",
+    "<p class='aarna-muted'>We layer these in based on your property and agreement. Not every item applies to every home.</p>",
     unsafe_allow_html=True,
 )
 for line in cfg.SERVICE_EXTRAS:
@@ -44,8 +44,8 @@ for line in cfg.SERVICE_EXTRAS:
 st.divider()
 c1, c2 = st.columns(2)
 with c1:
-    st.page_link("pages/4_Contact_Us.py", label="Request a conversation", icon="✉️", use_container_width=True)
+    theme.page_link_with_icon("pages/4_Contact_Us.py", "Request a conversation", "contact", use_container_width=True)
 with c2:
-    st.page_link("Home.py", label="Back to home", icon="🏠", use_container_width=True)
+    theme.page_link_with_icon("Home.py", "Back to home", "home", use_container_width=True)
 
 theme.render_footer()

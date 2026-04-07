@@ -43,8 +43,8 @@ st.markdown(
 st.divider()
 c1, c2 = st.columns(2)
 with c1:
-    st.page_link("pages/4_Contact_Us.py", label="Start a conversation", icon="✉️", use_container_width=True)
+    theme.page_link_with_icon("pages/4_Contact_Us.py", "Start a conversation", "contact", use_container_width=True)
 with c2:
-    st.page_link("pages/1_Services.py", label="View services", icon="📋", use_container_width=True)
+    theme.page_link_with_icon("pages/1_Services.py", "View services", "services", use_container_width=True)
 
 theme.render_footer()

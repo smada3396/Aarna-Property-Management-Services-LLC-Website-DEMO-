@@ -5,12 +5,8 @@ from __future__ import annotations
 import streamlit as st
 
 import business_config as cfg
+import mailer
 import theme
-
-try:
-    import requests
-except ImportError:
-    requests = None  # type: ignore
 
 theme.setup_page("Contact")
 theme.inject_css()
@@ -21,13 +17,6 @@ st.markdown(
     "<p class='aarna-muted'>Tell us about your property or question. We follow up using the contact information you provide.</p>",
     unsafe_allow_html=True,
 )
-
-
-def _forms_endpoint() -> str:
-    try:
-        return str(st.secrets["FORMSPREE_ENDPOINT"]).strip()
-    except Exception:
-        return ""
 
 
 if cfg.has_public_phone():
@@ -76,14 +65,6 @@ with st.container():
             unsafe_allow_html=True,
         )
     with col_b:
-        endpoint = _forms_endpoint()
-        if not endpoint:
-            st.info(
-                "**Property owners:** for the fastest response, email us or use this form and we will reply from the office. "
-                "**Tip for Streamlit Cloud:** add a `FORMSPREE_ENDPOINT` secret so submissions go straight to your inbox—"
-                "see the README in this project."
-            )
-
         with st.form("contact_form", clear_on_submit=True):
             name = st.text_input("Full name", placeholder="Your name")
             email = st.text_input("Email", placeholder="you@example.com")
@@ -98,10 +79,10 @@ with st.container():
             topic = st.selectbox(
                 "Topic",
                 [
-                    "Owner — full management",
-                    "Owner — leasing only / one-time",
-                    "Resident / applicant question",
-                    "Vendor / partnership",
+                    "Owner: full management",
+                    "Owner: leasing only or one time",
+                    "Resident or applicant question",
+                    "Vendor or partnership",
                     "Other",
                 ],
             )
@@ -115,41 +96,30 @@ with st.container():
         if submitted:
             if not name.strip() or not email.strip() or not message.strip():
                 st.error("Please fill in your name, email, and a short message.")
-            elif endpoint and requests:
-                try:
-                    resp = requests.post(
-                        endpoint,
-                        data={
-                            "name": name.strip(),
-                            "email": email.strip(),
-                            "phone": phone.strip(),
-                            "property": property_hint.strip(),
-                            "topic": topic,
-                            "message": message.strip(),
-                            "_subject": f"Aarna site: {topic}",
-                        },
-                        timeout=20,
-                    )
-                    if resp.ok:
-                        st.success("Thank you — your message was sent. We will get back to you shortly.")
-                    else:
-                        st.warning(
-                            "The form service returned an error. Please email us directly at the address on the left."
-                        )
-                except Exception:
-                    st.warning(
-                        "We could not reach the form service. Please email us directly at the address on the left."
-                    )
-            else:
-                follow = f"**{cfg.EMAIL}**"
-                if cfg.has_public_phone():
-                    follow += f" or **{cfg.PHONE_DISPLAY}**"
-                st.success(
-                    "Thanks — your message was recorded in this session only (demo). "
-                    f"For a real inquiry, please email {follow}."
+            elif not mailer.smtp_ready():
+                st.warning(
+                    f"This form cannot send mail until SMTP is configured for the app. "
+                    f"Please write to **{cfg.EMAIL}** directly."
                 )
+            else:
+                ok, err = mailer.send_contact_email(
+                    visitor_name=name.strip(),
+                    visitor_email=email.strip(),
+                    visitor_phone=phone.strip(),
+                    property_hint=property_hint.strip(),
+                    topic=topic,
+                    message=message.strip(),
+                )
+                if ok:
+                    st.success("Thank you. Your message was sent. We will get back to you shortly.")
+                elif err == "auth":
+                    st.error("Email could not be sent (sign in problem). Please contact us by email or phone.")
+                else:
+                    st.warning(
+                        f"We could not send your message right now. Please email **{cfg.EMAIL}** or call the office."
+                    )
 
 st.divider()
-st.page_link("Home.py", label="Back to home", icon="🏠")
+theme.page_link_with_icon("Home.py", "Back to home", "home", use_container_width=True)
 
 theme.render_footer()
