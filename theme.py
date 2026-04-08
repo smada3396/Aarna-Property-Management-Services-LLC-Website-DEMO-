@@ -12,6 +12,7 @@ import business_config as cfg
 _ASSETS = Path(__file__).resolve().parent / "assets"
 _LOGO_MARK = _ASSETS / "logo.svg"
 _LOGO_FULL = _ASSETS / "logo-full.svg"
+_LOGO_FULL_ON_DARK = _ASSETS / "logo-full-on-dark.svg"
 
 # Material Symbols (built into Streamlit page_link): one widget = icon + label
 _NAV_MATERIAL_ICONS: dict[str, str] = {
@@ -356,6 +357,14 @@ def inject_css() -> None:
                 letter-spacing: -0.02em;
                 line-height: 1.25;
             }
+            .aarna-topbar-logo-wrap {
+                display: inline-flex;
+                align-items: center;
+                line-height: 0;
+            }
+            .aarna-topbar-minimal-logo.aarna-logo-for-dark-ui {
+                display: none;
+            }
 
             div[data-testid="stSidebarContent"] {
                 background: linear-gradient(180deg, #0a1f35 0%, #0f2744 45%, #122a47 100%) !important;
@@ -476,6 +485,12 @@ def inject_css() -> None:
                 .aarna-topbar-minimal-name {
                     color: #e8eef4 !important;
                 }
+                .aarna-topbar-minimal-logo.aarna-logo-for-light-ui {
+                    display: none !important;
+                }
+                .aarna-topbar-minimal-logo.aarna-logo-for-dark-ui {
+                    display: block !important;
+                }
                 .aarna-footer {
                     border-top-color: #2d3f56 !important;
                     color: #8a9bb4 !important;
@@ -524,11 +539,13 @@ def inject_css() -> None:
 
 def hero_brand_html() -> str:
     """Logo + Aarna Property Management name for the home hero (on navy background)."""
-    full_uri = _svg_data_uri(_LOGO_FULL)
+    logo_path = _LOGO_FULL_ON_DARK if _LOGO_FULL_ON_DARK.is_file() else _LOGO_FULL
+    full_uri = _svg_data_uri(logo_path)
     mark_uri = _svg_data_uri(_LOGO_MARK)
     if full_uri:
         img = f'<img src="{full_uri}" class="aarna-hero-logo" alt="{cfg.COMPANY_NAME}"/>'
-    elif mark_uri:
+        return f'<div class="aarna-hero-brand">{img}</div>'
+    if mark_uri:
         img = f'<img src="{mark_uri}" class="aarna-hero-logo-mark" alt="{cfg.SHORT_NAME} logo"/>'
     else:
         img = ""
@@ -543,12 +560,28 @@ def hero_brand_html() -> str:
 
 def render_top_bar() -> None:
     """Compact logo + legal name only (no white card, no service area paragraph)."""
-    full_uri = _svg_data_uri(_LOGO_FULL)
+    light_uri = _svg_data_uri(_LOGO_FULL) if _LOGO_FULL.is_file() else None
+    dark_uri = (
+        _svg_data_uri(_LOGO_FULL_ON_DARK)
+        if _LOGO_FULL_ON_DARK.is_file()
+        else light_uri
+    )
     mark_uri = _svg_data_uri(_LOGO_MARK)
     parts: list[str] = ['<div class="aarna-topbar-minimal">']
-    if full_uri:
+    if light_uri and dark_uri and light_uri != dark_uri:
+        parts.append('<span class="aarna-topbar-logo-wrap">')
         parts.append(
-            f'<img src="{full_uri}" class="aarna-topbar-minimal-logo" alt="{cfg.COMPANY_NAME}"/>'
+            f'<img src="{light_uri}" class="aarna-topbar-minimal-logo aarna-logo-for-light-ui" '
+            f'alt="{cfg.COMPANY_NAME}"/>'
+        )
+        parts.append(
+            f'<img src="{dark_uri}" class="aarna-topbar-minimal-logo aarna-logo-for-dark-ui" '
+            f'alt="" aria-hidden="true"/>'
+        )
+        parts.append("</span>")
+    elif light_uri:
+        parts.append(
+            f'<img src="{light_uri}" class="aarna-topbar-minimal-logo" alt="{cfg.COMPANY_NAME}"/>'
         )
     elif mark_uri:
         parts.append(
